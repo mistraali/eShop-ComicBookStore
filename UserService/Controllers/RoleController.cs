@@ -36,6 +36,11 @@ namespace UserService.Controllers
         {
             var result = await _roleService.GetRoleByIdAsync(id);
 
+            if (result == null)
+            {
+                return NotFound($"Rola o {id} nie została znaleziona.");
+            }
+
             return Ok(result);
         }
 
@@ -45,6 +50,11 @@ namespace UserService.Controllers
         public async Task<IActionResult> Get(string name)
         {
             var result = await _roleService.GetRoleByNameAsync(name);
+
+            if (result == null)
+            {
+                return NotFound($"Rola {name} nie została znaleziona.");
+            }
 
             return Ok(result);
         }

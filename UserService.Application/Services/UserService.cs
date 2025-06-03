@@ -75,6 +75,10 @@ public class UserService : IUserService
     public async Task<AdminReadDto> GetUserByIdAsync(int id)
     {
         var user  = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with id: {id} does not exist.");
+        }
 
         var dto = new AdminReadDto
         {
@@ -94,6 +98,10 @@ public class UserService : IUserService
     public async Task<UserReadDto> GetUserDtoByIdAsync(int id)
     {
         var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with id: {id} does not exist.");
+        }
 
         var dto = new UserReadDto
         {
@@ -110,6 +118,10 @@ public class UserService : IUserService
     public async Task<AdminReadDto> GetUserByUsernameAsync(string username)
     {
         var user = await _userRepository.GetUserByUsernameAsync(username);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with username: {username} does not exist.");
+        }
 
         var dto = new AdminReadDto
         {
@@ -148,7 +160,7 @@ public class UserService : IUserService
         var user = await _userRepository.GetUserByIdAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException("User does not exist.");
+            throw new InvalidOperationException($"User with id: {userId} does not exist.");
         }
         else
         {
@@ -165,7 +177,7 @@ public class UserService : IUserService
         var user = await _userRepository.GetUserByIdAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException("User does not exist.");
+            throw new InvalidOperationException($"User with id: {userId} does not exist.");
         }
         else
         {

@@ -52,13 +52,13 @@ public class UserPanelController : ControllerBase
             var result = await _userService.ChangePasswordAsync(userId, dto);
 
             if (result)
-                return Ok(new { message = "Hasło zostało pomyślnie zmienione." });
+                return Ok(new { message = "Password has been changed succesfully." });
 
-            return BadRequest(new { message = "Nie udało się zmienić hasła. Sprawdź aktualne hasło." });
+            return BadRequest(new { message = "Impossible to change password. Verify your current password." });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Wystąpił błąd serwera.", error = ex.Message });
+            return StatusCode(500, new { message = "Server error.", error = ex.Message });
         }
 
     }
@@ -79,13 +79,13 @@ public class UserPanelController : ControllerBase
             var result = await _userService.EditUserAccountAsync(userId, dto);
 
             if (result)
-                return Ok(new { message = "Konto zmodyfikowane pomyślnie." });
+                return Ok(new { message = "Account has been modified succesfully." });
 
-            return BadRequest(new { message = "Nie udało się wyedytować konta. Skontaktuj się z administratorem." });
+            return BadRequest(new { message = "Impossible to modify account. Contact your administrator." });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Wystąpił błąd serwera.", error = ex.Message });
+            return StatusCode(500, new { message = "Server error.", error = ex.Message });
         }
 
     }
