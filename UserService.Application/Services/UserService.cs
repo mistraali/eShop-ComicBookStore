@@ -204,6 +204,7 @@ public class UserService : IUserService
             
             //var newRoles = new List<Role> { };
             //user.Roles = newRoles;
+            //To by jeszcze trzeba jakoś obsłużyc
 
             await _userRepository.UpdateUserAsync(user);
 
