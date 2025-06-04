@@ -1,5 +1,5 @@
 
-namespace eShop_ComicBookStore;
+namespace eShopService;
 
 public class Program
 {
