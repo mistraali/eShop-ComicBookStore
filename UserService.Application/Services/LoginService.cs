@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Application.Kafka;
+using UserService.Domain.Events;
 using UserService.Domain.Exceptions;
 using UserService.Domain.Repositories;
 
@@ -32,7 +34,19 @@ public class LoginService : ILoginService
         var roles = user.Roles.Select(r => r.Name).ToList();
 
         var token = _jwtTokenService.GenerateToken(user.Id, roles);
-        
+
+        var kafka = new UserKafkaProducer("kafka:9092"); // lub z appsettings
+
+        Console.WriteLine($"[LoginService] Sending UserLoggedEvent for user: {user.Id}, {user.Email}");
+
+        await kafka.PublishUserLoggedAsync(new UserLoggedEvent
+        {
+            UserId = user.Id,
+            Email = user.Email
+        });
+
+        Console.WriteLine("[LoginService] UserLoggedEvent sent.");
+
         return token;
     }
 }
