@@ -8,6 +8,7 @@ namespace CartService.Domain.DTOs;
 
 public class AddItemToCartDto
 {
-    public Guid ProductId { get; set; }
+    public int CartId { get; set; } // CartId in Cart == UserId
+    public int ProductId { get; set; }
     public int Quantity { get; set; }
 }

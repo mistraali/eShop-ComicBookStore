@@ -30,9 +30,22 @@ namespace CartService.Controllers
         }
 
         // POST api/<CartController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("create-cart-for-user")]
+        public async Task<IActionResult> Post(int userId)
         {
+            // Call the service to create a cart for the user
+            var result = await _cartService.CreateCartForUserAsync(userId);
+            if (result != null)
+            {
+                // Return success response
+                return Ok(new { message = "Cart created successfully.", userId = userId });
+            }
+            else
+            {
+                // Return error response
+                return BadRequest(new { message = "Failed to create cart for the user." });
+            }
+
         }
 
         // PUT api/<CartController>/5

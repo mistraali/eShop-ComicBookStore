@@ -10,7 +10,7 @@ namespace CartService.Domain.Repositories;
 
 public interface ICartRepository
 {
-    Task<Cart> CreateCartForUserAsync(int userId);
+    Task<Cart> CreateCartForUserAsync(Cart cart);
 
     Task<Cart> GetCartByUserIdAsync(int userId);
 

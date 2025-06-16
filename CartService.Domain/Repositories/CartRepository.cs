@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CartService.Domain.Repositories;
 
@@ -26,9 +27,10 @@ public class CartRepository : ICartRepository
         throw new NotImplementedException();
     }
 
-    Task<Cart> ICartRepository.CreateCartForUserAsync(int userId)
+    async Task<Cart> ICartRepository.CreateCartForUserAsync(Cart cart)
     {
-        throw new NotImplementedException();
+        await _context.SaveChangesAsync();
+        return cart;
     }
 
     Task<Cart> ICartRepository.GetCartByUserIdAsync(int userId)
