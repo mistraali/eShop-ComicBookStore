@@ -2,6 +2,7 @@
 using CartService.Application.Services;
 using CartService.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using CartService.Kafka;
 
 namespace CartService;
 
@@ -17,6 +18,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddScoped<ICartService, CartService.Application.Services.CartService>();
+        //builder.Services.AddHostedService<KafkaUserEventsConsumer>(); //-> coœ nie dzia³a :(
 
 
         builder.Services.AddControllers();
