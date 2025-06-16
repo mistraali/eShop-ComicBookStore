@@ -18,7 +18,16 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddScoped<ICartService, CartService.Application.Services.CartService>();
-        //builder.Services.AddHostedService<KafkaUserEventsConsumer>(); //-> coœ nie dzia³a :(
+        
+        //Kafka
+        try
+        {
+            builder.Services.AddHostedService<KafkaUserEventsConsumer>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Nie uda³o siê dodaæ KafkaUserEventsConsumer: {ex.Message}");
+        }
 
 
         builder.Services.AddControllers();

@@ -12,7 +12,7 @@ namespace UserService.Application.Kafka;
 public class UserKafkaProducer
 {
     private readonly IProducer<Null, string> _producer;
-    private readonly string _topic = "user.logged";
+    private readonly string _topic = "user-events";
 
     public UserKafkaProducer(string bootstrapServers)
     {
@@ -23,6 +23,10 @@ public class UserKafkaProducer
     public async Task PublishUserLoggedAsync(UserLoggedEvent @event)
     {
         var json = JsonSerializer.Serialize(@event);
+        Console.WriteLine($"[KafkaProducer] Sending event: {json}");
+
         await _producer.ProduceAsync(_topic, new Message<Null, string> { Value = json });
+
+        Console.WriteLine("[KafkaProducer] Event sent.");
     }
 }

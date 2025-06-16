@@ -35,12 +35,17 @@ public class LoginService : ILoginService
 
         var token = _jwtTokenService.GenerateToken(user.Id, roles);
 
-        var kafka = new UserKafkaProducer("localhost:9092"); // lub z appsettings
+        var kafka = new UserKafkaProducer("kafka:9092"); // lub z appsettings
+
+        Console.WriteLine($"[LoginService] Sending UserLoggedEvent for user: {user.Id}, {user.Email}");
+
         await kafka.PublishUserLoggedAsync(new UserLoggedEvent
         {
             UserId = user.Id,
             Email = user.Email
         });
+
+        Console.WriteLine("[LoginService] UserLoggedEvent sent.");
 
         return token;
     }
