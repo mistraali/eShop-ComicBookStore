@@ -13,6 +13,6 @@ public class Cart
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int UserId { get; set; }
-    public List<CartItem> Items { get; set; } = new List<CartItem>();
+    public List<CartItem> CartItems { get; set; } = new List<CartItem>();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -14,6 +14,8 @@ public interface ICartRepository
 
     Task<Cart> GetCartByUserIdAsync(int userId);
 
+    Task<List<Cart>> GetAllCartsAsync();
+
     Task<CartItem> AddItemToCartAsync(int userId, AddItemToCartDto addItemToCartDto);
 
     Task<CartItem> UpdateItemInCartAsync(int userId, AddItemToCartDto addItemToCartDto);
