@@ -1,5 +1,6 @@
 ﻿using CartService.Application.Services;
 using CartService.Domain.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Validations;
 
@@ -114,6 +115,7 @@ namespace CartService.Controllers
 
         // DELETE api/<CartController>/5
         [HttpDelete("delete-cart-by-user-id")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteCartById(int userId)
         {
             var result = await _cartService.DeleteCartByIdAsync(userId);
