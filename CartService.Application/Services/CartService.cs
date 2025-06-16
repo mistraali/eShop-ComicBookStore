@@ -89,4 +89,16 @@ public class CartService : ICartService
         };
         return cartDto;
     }
+
+    public async Task<bool> DeleteCartByIdAsync(int userId)
+    {
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+        if (cart == null)
+        {
+            return false; // cart does not exist
+        }
+        
+        await _cartRepository.DeleteCartByIdAsync(cart.UserId);
+        return true; 
+    }
 }

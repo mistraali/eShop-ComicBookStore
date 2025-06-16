@@ -53,7 +53,7 @@ public class CartRepository : ICartRepository
         return await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
-    async Task<Cart> ICartRepository.CreateCartForUserAsync(Cart cart)
+    public async Task<Cart> CreateCartForUserAsync(Cart cart)
     {
         await _context.Carts.AddAsync(cart);
         await _context.SaveChangesAsync();
@@ -65,4 +65,11 @@ public class CartRepository : ICartRepository
         throw new NotImplementedException();
     }
 
+    public async Task<bool> DeleteCartByIdAsync(int userId)
+    {
+        var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+        _context.Carts.Remove(cart);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }
