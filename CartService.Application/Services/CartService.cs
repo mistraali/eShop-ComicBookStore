@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UserService.Domain.Seeders;
+namespace CartService.Application.Services;
 
-public interface IUserDbSeeder
+public class CartService : ICartService
 {
-    Task Seed();
 }
