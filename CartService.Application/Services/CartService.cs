@@ -76,4 +76,17 @@ public class CartService : ICartService
 
         return dto;
     }
+
+    public async Task<GetCartDto> ClearCartByIdAsync(int userId)
+    {
+        await _cartRepository.ClearCartByIdAsync(userId);
+
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+        var cartDto = new GetCartDto
+        {
+            UserId = cart.UserId,
+            CartItems = cart.CartItems.Select(c => c.ProductId).ToList()
+        };
+        return cartDto;
+    }
 }

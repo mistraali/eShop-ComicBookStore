@@ -62,7 +62,7 @@ namespace CartService.Controllers
         }
 
         // PUT api/<CartController>/5
-        [HttpPut("{id}")]
+        [HttpPut("add-item-to-cart")]
         public async Task<IActionResult> AddItemToCart([FromBody] AddItemToCartDto item)
         {
             var result = await _cartService.AddItemToCartAsync(item);
@@ -78,10 +78,37 @@ namespace CartService.Controllers
             }
         }
 
-        // DELETE api/<CartController>/5
-        [HttpDelete("{id}")]
-        public void DeleteUsersCart(int userId)
+        // PUT api/<CartController>/5
+        [HttpPut("clear-cart/{id}")]
+        public async Task<IActionResult> ClearCartById(int userId)
         {
+            var result = await _cartService.ClearCartByIdAsync(userId);
+            if (result != null)
+            {
+                // Return success response
+                return Ok(new { message = $"Cart for user with Id: {userId} was cleared." });
+            }
+            else
+            {
+                // Return error response
+                return BadRequest(new { message = "Cannot clear the cart." });
+            }
         }
+
+        //// DELETE api/<CartController>/5
+        //[HttpDelete("delete-cart-by-id/{id}")]
+        //public async Task<IActionResult> DeleteCartById(int userId)
+        //{
+        //    var result = await _cartService.DeleteCartByIdAsync(userId);
+        //    {
+        //        // Return success response
+        //        return Ok(new { message = $"Cart for user with Id: {userId} was deleted." });
+        //    }
+        //    else
+        //    {
+        //        // Return error response
+        //        return BadRequest(new { message = "Cannot delete the cart." });
+        //    }
+        //}
     }
 }
