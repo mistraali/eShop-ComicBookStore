@@ -61,22 +61,22 @@ namespace CartService.Controllers
 
         }
 
-        //// PUT api/<CartController>/5
-        //[HttpPut("{id}")]
-        //public void AddItemToCart(int userId, [FromBody] AddItemToCartDto item)
-        //{
-        //    var result = await _cartService.AddItemToCartAsync(userId, item);
-        //    if (result != null)
-        //    {
-        //        // Return success response
-        //        return Ok(new { message = $"Item added to cart for user with Id: {userId}.");
-        //    }
-        //    else
-        //    {
-        //        // Return error response
-        //        return BadRequest(new { message = "Cannot add item to cart." });
-        //    }
-        //}
+        // PUT api/<CartController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AddItemToCart([FromBody] AddItemToCartDto item)
+        {
+            var result = await _cartService.AddItemToCartAsync(item);
+            if (result != null)
+            {
+                // Return success response
+                return Ok(new { message = $"Item added to cart for user with Id: {item.CartId}." });
+            }
+            else
+            {
+                // Return error response
+                return BadRequest(new { message = "Cannot add item to cart." });
+            }
+        }
 
         // DELETE api/<CartController>/5
         [HttpDelete("{id}")]

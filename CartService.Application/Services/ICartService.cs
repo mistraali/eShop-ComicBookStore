@@ -13,8 +13,8 @@ public interface ICartService
     Task<Cart> CreateCartForUserAsync(int userId);
     Task<List<GetCartDto>> GetAllCartsAsync();
     Task<GetCartDto> GetCartByUserIdAsync(int userId);
+    Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item);
 
-    //Task AddItemToCartAsync(int userId, int productId, int quantity);
     //Task UpdateItemInCartAsync(int userId, int productId, int quantity);
     //Task RemoveItemFromCartAsync(int userId, int productId);
     //Task ClearCartAsync(int userId);

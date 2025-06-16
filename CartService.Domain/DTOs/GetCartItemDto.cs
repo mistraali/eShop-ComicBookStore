@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CartService.Domain.Models;
+namespace CartService.Domain.DTOs;
 
-public class CartItem
+public class GetCartItemDto
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int CartItemId { get; set; } // Primary key for CartItem
     public int CartId { get; set; } // CartId in Cart == UserId
     public int ProductId { get; set; }
     public int Quantity { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

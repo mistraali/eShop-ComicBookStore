@@ -55,4 +55,25 @@ public class CartService : ICartService
         return cartDto;
     }
 
+    public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
+    {
+        var newItem = new CartItem
+        {
+            CartId = item.CartId,
+            ProductId = item.ProductId,
+            Quantity = item.Quantity
+        };
+
+        var result = await _cartRepository.AddItemToCartAsync(newItem);  
+        
+        var dto = new GetCartItemDto
+        {
+            CartItemId = result.CartItemId,
+            CartId = result.CartId,
+            ProductId = result.ProductId,
+            Quantity = result.Quantity
+        };
+
+        return dto;
+    }
 }
