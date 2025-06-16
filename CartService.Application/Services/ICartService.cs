@@ -18,5 +18,5 @@ public interface ICartService
     Task<GetCartDto> ClearCartByIdAsync(int userId);
 
     //Task UpdateItemInCartAsync(int userId, int productId, int quantity);
-    //Task RemoveItemFromCartAsync(int userId, int productId);
+    Task<GetCartDto> RemoveItemFromCartAsync(int userId, int productId);
 }

@@ -78,6 +78,23 @@ namespace CartService.Controllers
             }
         }
 
+        // DELETE api/<CartController>/5
+        [HttpDelete("remove-item-from-cart")]
+        public async Task<IActionResult> RemoveItemFromCart(int userId, int productId)
+        {
+            try
+            {
+                await _cartService.RemoveItemFromCartAsync(userId, productId);
+                // Return success response
+                return Ok(new { message = $"Item with Id: {productId} removed from cart for user with Id: {userId}." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error response
+                return BadRequest(new { message = "Item cannot be removed from cart." });
+            }
+        }
+
         // PUT api/<CartController>/5
         [HttpPut("clear-cart-by-user-id")]
         public async Task<IActionResult> ClearCartById(int userId)

@@ -60,9 +60,15 @@ public class CartRepository : ICartRepository
         return cart;
     }
 
-    Task ICartRepository.RemoveItemFromCartAsync(int userId, int productId)
+    public async Task<Cart> RemoveItemFromCartAsync(int userId, int productId)
     {
-        throw new NotImplementedException();
+
+        var itemToRemove = await _context.CartItems
+    .FirstAsync(ci => ci.CartId == userId && ci.ProductId == productId);
+
+        _context.CartItems.Remove(itemToRemove);
+        await _context.SaveChangesAsync();
+        return await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
     public async Task<bool> DeleteCartByIdAsync(int userId)

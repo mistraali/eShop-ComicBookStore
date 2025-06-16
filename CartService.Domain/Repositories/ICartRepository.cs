@@ -20,7 +20,7 @@ public interface ICartRepository
 
     Task<CartItem> UpdateItemInCartAsync(CartItem newitem);
     
-    Task RemoveItemFromCartAsync(int userId, int productId);
+    Task<Cart> RemoveItemFromCartAsync(int userId, int productId);
    
     Task<Cart> ClearCartByIdAsync(int userId);
 

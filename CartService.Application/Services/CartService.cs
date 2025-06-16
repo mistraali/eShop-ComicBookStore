@@ -77,6 +77,28 @@ public class CartService : ICartService
         return dto;
     }
 
+    public async Task<GetCartDto> RemoveItemFromCartAsync(int userId, int productId)
+    {
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+        if (cart == null)
+        {
+            throw new InvalidOperationException($"Cart for user with id: {userId} does not exist.");
+        }
+        var itemToRemove = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+        if (itemToRemove == null)
+        {
+            throw new InvalidOperationException($"Item with product id: {productId} does not exist in the cart for user with id: {userId}.");
+        }
+        await _cartRepository.RemoveItemFromCartAsync(userId, productId);
+        var cartDto = new GetCartDto
+        {
+            UserId = cart.UserId,
+            CartItems = cart.CartItems.Select(c => c.ProductId).ToList()
+        };
+
+        return cartDto;
+    }
+
     public async Task<GetCartDto> ClearCartByIdAsync(int userId)
     {
         await _cartRepository.ClearCartByIdAsync(userId);
