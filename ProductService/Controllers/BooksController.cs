@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProductService.Application.Services;
+using ProductService.Domain.DTOs;
 using ProductService.Domain.Models;
-using ProductService.Domain.Repositories;
 
 namespace ProductService.Controllers;
 
@@ -8,33 +9,56 @@ namespace ProductService.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly IBookRepository _repository;
+    private readonly IBookService _bookService;
 
-    public BooksController(IBookRepository repository)
+    public BooksController(IBookService bookService)
     {
-        _repository = repository;
+        _bookService = bookService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+    public async Task<ActionResult<List<BookDto>>> GetBooks()
     {
-        var books = await _repository.GetAllAsync();
+        var books = await _bookService.GetAllBooksAsync();
         return Ok(books);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Book>> GetBook(int id)
+    public async Task<ActionResult<BookDto>> GetBook(int id)
     {
-        var book = await _repository.GetByIdAsync(id);
-        if (book == null) return NotFound();
-        return Ok(book);
+        try
+        {
+            var book = await _bookService.GetBookByIdAsync(id);
+            return Ok(book);
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost]
-    public async Task<ActionResult<Book>> PostBook(Book book)
+    public async Task<ActionResult<BookDto>> PostBook(Book book)
     {
-        await _repository.AddAsync(book);
-        return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var createdBook = await _bookService.CreateBookAsync(book);
+        // Zakładam, że CreateBookAsync zwraca Book (w razie potrzeby można mapować do DTO)
+        var createdBookDto = new BookDto
+        {
+            Id = createdBook.Id,
+            Name = createdBook.Name,
+            Author = createdBook.Author,
+            Price = createdBook.Price,
+            Stock = createdBook.Stock,
+            PublisherId = createdBook.PublisherId,
+            ReleaseYear = createdBook.ReleaseYear,
+            Ean = createdBook.Ean,
+            Isbn = createdBook.Isbn,
+            Sku = createdBook.Sku
+        };
+
+        return CreatedAtAction(nameof(GetBook), new { id = createdBookDto.Id }, createdBookDto);
     }
 
     [HttpPut("{id}")]
@@ -42,18 +66,22 @@ public class BooksController : ControllerBase
     {
         if (id != book.Id) return BadRequest();
 
-        await _repository.UpdateAsync(book);
-        return NoContent();
+        try
+        {
+            var updatedBookDto = await _bookService.UpdateBookAsync(id, book);
+            return NoContent();
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBook(int id)
     {
-        var book = await _repository.GetByIdAsync(id);
-        if (book == null) return NotFound();
-
-        await _repository.DeleteAsync(book);
+        var success = await _bookService.DeleteBookAsync(id);
+        if (!success) return NotFound();
         return NoContent();
     }
 }
-
