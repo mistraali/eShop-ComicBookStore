@@ -2,8 +2,6 @@
 
 public class BaseModel
 {
-    public bool Deleted { get; set; } = false;
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Guid CreatedBy { get; set; }

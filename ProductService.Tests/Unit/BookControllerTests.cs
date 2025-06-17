@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using ProductService.Application.Services;
-using ProductService.Domain.DTOs;
 using ProductService.Domain.Models;
 using ProductService.Domain.Repositories;
-using Xunit;
 
 namespace ProductService.Tests.Unit;
 
-public class BookServiceTest
+public class BookControllerTests
 {
     private readonly Mock<IBookRepository> _bookRepositoryMock;
     private readonly BookService _bookService;
 
-    public BookServiceTest()
+    public BookControllerTests()
     {
         _bookRepositoryMock = new Mock<IBookRepository>();
         _bookService = new BookService(_bookRepositoryMock.Object);
@@ -140,7 +134,8 @@ public class BookServiceTest
             Ean = "1234567890123",
             Isbn = "978-3-16-148410-0",
             Sku = "SKU123",
-            Deleted = false,
+            CategoryId = 1,
+
             CreatedAt = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedAt = DateTime.UtcNow,

@@ -36,7 +36,13 @@ public class BookRepository : IBookRepository
 
     public async Task DeleteAsync(Book book)
     {
-        _context.Books.Remove(book);
+        var existingBook = await _context.Books.FindAsync(book.Id);
+        if (existingBook == null)
+        {
+            return;
+        }
+
+        _context.Books.Remove(existingBook);
         await _context.SaveChangesAsync();
     }
 }

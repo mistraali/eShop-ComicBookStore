@@ -81,7 +81,6 @@ public class BookService : IBookService
             Ean = book.Ean,
             Isbn = book.Isbn,
             Sku = book.Sku,
-            Deleted = book.Deleted,
             CreatedAt = book.CreatedAt,
             CreatedBy = book.CreatedBy,
             UpdatedAt = book.UpdatedAt,

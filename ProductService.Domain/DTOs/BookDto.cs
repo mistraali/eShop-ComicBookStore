@@ -12,13 +12,10 @@ public class BookDto
     public string Author { get; set; }
     public int PublisherId { get; set; }
     public int ReleaseYear { get; set; }
+    public int CategoryId { get; set; }
 
-
-    public bool Deleted { get; set; }
     public DateTime CreatedAt { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
     public Guid UpdatedBy { get; set; }
 }
-
-
