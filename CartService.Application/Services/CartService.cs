@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CartService.Application.Events;
+using CartService.Application.Kafka;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
@@ -12,9 +14,11 @@ namespace CartService.Application.Services;
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
-    public CartService(ICartRepository cartRepository)
+    private readonly CartKafkaProducer _cartKafkaProducer;
+    public CartService(ICartRepository cartRepository, CartKafkaProducer cartKafkaProducer)
     {
         _cartRepository = cartRepository;
+        _cartKafkaProducer = cartKafkaProducer;
     }
 
     public async Task<Cart> CreateCartForUserAsync(int userId)
@@ -57,6 +61,11 @@ public class CartService : ICartService
 
     public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
     {
+        await _cartKafkaProducer.SendCheckProductExistsAsync(new CheckIfProductExistsEvent
+        {
+            ProductId = item.ProductId
+        });
+
         var newItem = new CartItem
         {
             CartId = item.CartId,

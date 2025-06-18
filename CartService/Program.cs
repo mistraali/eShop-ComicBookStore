@@ -3,6 +3,8 @@ using CartService.Application.Services;
 using CartService.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using CartService.Kafka;
+using Microsoft.Extensions.Options;
+using CartService.Application.Kafka;
 
 namespace CartService;
 
@@ -28,6 +30,14 @@ public class Program
         {
             Console.WriteLine($"Nie uda³o siê dodaæ KafkaUserEventsConsumer: {ex.Message}");
         }
+        //for product events
+        builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
+
+        builder.Services.AddSingleton<CartKafkaProducer>(sp =>
+        {
+            var kafkaSettings = sp.GetRequiredService<IOptions<KafkaSettings>>().Value;
+            return new CartKafkaProducer(kafkaSettings.BootstrapServers);
+        });
 
 
         builder.Services.AddControllers();

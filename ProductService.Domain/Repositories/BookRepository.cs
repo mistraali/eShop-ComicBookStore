@@ -45,5 +45,10 @@ public class BookRepository : IBookRepository
         _context.Books.Remove(existingBook);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<bool> ExistsAsync(int id)
+    {
+        return await _context.Books.AnyAsync(b => b.Id == id);
+    }
 }
 

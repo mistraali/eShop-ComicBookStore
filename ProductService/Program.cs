@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ProductService.Domain.Repositories;
 using ProductService.Application.Services;
+using ProductService.Application.Kafka.Consumers;
+using ProductService.Application.Kafka;
 
 namespace ProductService
 {
@@ -16,6 +18,11 @@ namespace ProductService
             builder.Services.AddScoped<IBookService, BookService>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+            // Kafka configuration      
+            builder.Services.AddHostedService<ProductConsumerHostedService>();
+            builder.Services.AddScoped<CheckIfProductExistsConsumer>();
+            builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
 
             builder.Services.AddControllers();
 
