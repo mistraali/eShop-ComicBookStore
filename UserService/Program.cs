@@ -9,6 +9,7 @@ using UserService.Domain.Repositories;
 using System.Threading.Tasks;
 using UserService.Domain.Seeders;
 using Microsoft.OpenApi.Models;
+using UserService.Application.Kafka;
 
 
 namespace UserService;
@@ -22,8 +23,18 @@ public class Program
         //Database context
         builder.Services.AddDbContext<UserDataContext>(x => x.UseInMemoryDatabase("UserDatabase"), ServiceLifetime.Transient);
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        
+        //Services
         builder.Services.AddScoped<IRoleRepository, RoleRepository>();
         builder.Services.AddScoped<IUserDbSeeder, UserDbSeeder>();
+
+        //Kafka
+        builder.Services.AddScoped<UserKafkaProducer>(provider =>
+        {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var bootstrapServers = config.GetSection("Kafka:BootstrapServers").Value;
+            return new UserKafkaProducer(bootstrapServers);
+        });
 
         // JWT config
         var jwtSettings = builder.Configuration.GetSection("Jwt");
