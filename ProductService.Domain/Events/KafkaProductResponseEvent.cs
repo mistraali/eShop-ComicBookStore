@@ -1,4 +1,4 @@
-﻿namespace ProductService.Kafka;
+﻿namespace ProductService.Domain.Events;
 
 public class KafkaProductResponseEvent
 {

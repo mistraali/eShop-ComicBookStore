@@ -123,4 +123,21 @@ public class CartService : ICartService
         await _cartRepository.DeleteCartByIdAsync(cart.UserId);
         return true; 
     }
+
+    public async Task AttachProductNameToPendingCartItemAsync(int userId, string productName)
+    {
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+        if (cart == null)
+        {
+            throw new InvalidOperationException($"Cart for user with id: {userId} does not exist.");
+        }
+
+
+        var pendingItem = cart.CartItems.FirstOrDefault(ci => ci.ProductName == null);
+        if (pendingItem != null)
+        {
+            pendingItem.ProductName = productName;
+            await _cartRepository.SaveChangesAsync();
+        }
+    }
 }

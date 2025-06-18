@@ -1,4 +1,4 @@
-﻿namespace CartService.Kafka;
+﻿namespace CartService.Domain.Events;
 
 public class KafkaProductRequestedEvent
 {
