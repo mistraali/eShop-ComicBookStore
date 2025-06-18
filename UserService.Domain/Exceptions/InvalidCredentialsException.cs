@@ -8,5 +8,5 @@ namespace UserService.Domain.Exceptions;
 
 public class InvalidCredentialsException : Exception
 {
-    public InvalidCredentialsException() : base("Login is not existing or password is incorrect.") { }
+    public InvalidCredentialsException() : base("Login is not existing, password is incorrect or account expired.") { }
 }

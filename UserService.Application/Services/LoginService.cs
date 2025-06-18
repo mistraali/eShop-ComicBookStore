@@ -28,7 +28,7 @@ public class LoginService : ILoginService
     {
         var user = await _userRepository.GetUserByUsernameAsync(username);
 
-        if (user == null || user.Password != password)
+        if (user == null || user.Password != password || user.IsActive != true)
         {
             throw new InvalidCredentialsException();
         }

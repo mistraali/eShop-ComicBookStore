@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Services;
 using UserService.Domain.DTOs;
+using UserService.Domain.Exceptions;
 using UserService.Domain.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -33,10 +34,23 @@ public class AdminPanelController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> Get(int id)
     {
-        var result = await _userService.GetUserByIdAsync(id);
-
-        return Ok(result);
+        try
+        {
+            var result = await _userService.GetUserByIdAsync(id);
+            if (result != null)
+                return Ok(result);
+            throw new InvalidOperationException();
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Server error.", error = ex.Message });
+        }
     }
+
 
     // PUT api/<UserController>/5
     [HttpPut("edit-user-account/{id}")]
@@ -50,7 +64,7 @@ public class AdminPanelController : ControllerBase
             if (result)
                 return Ok(new { message = "Account has been modified succesfully." });
 
-            return BadRequest(new { message = "Impossible to modify accont." });
+            return BadRequest(new { message = "Impossible to modify account." });
         }
         catch (Exception ex)
         {

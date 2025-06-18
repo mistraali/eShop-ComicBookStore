@@ -4,6 +4,8 @@ using UserService.Application.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using UserService.Domain.Exceptions;
+using System.Linq.Expressions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -54,7 +56,11 @@ public class UserPanelController : ControllerBase
             if (result)
                 return Ok(new { message = "Password has been changed succesfully." });
 
-            return BadRequest(new { message = "Impossible to change password. Verify your current password." });
+            throw new InvalidOperationException();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(400, new { message = "Impossible to change password. Verify your current password." });
         }
         catch (Exception ex)
         {
