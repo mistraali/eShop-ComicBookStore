@@ -3,6 +3,9 @@ using ProductService.Domain.Repositories;
 using ProductService.Application.Services;
 using ProductService.Application.Kafka.Consumers;
 using ProductService.Application.Kafka;
+using ProductService.Infrastructure.Kafka;
+using Microsoft.Extensions.Options;
+using ProductService.Application.Kafka.Producers;
 
 namespace ProductService
 {
@@ -20,9 +23,16 @@ namespace ProductService
             builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             // Kafka configuration      
-            builder.Services.AddHostedService<ProductConsumerHostedService>();
-            builder.Services.AddScoped<CheckIfProductExistsConsumer>();
             builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
+            builder.Services.AddHostedService<ProductConsumerHostedService>();
+            builder.Services.AddSingleton<CheckIfProductExistsConsumer>();
+            builder.Services.AddSingleton<ProductKafkaProducer>(sp =>
+            {
+                var kafkaSettings = sp.GetRequiredService<IOptions<KafkaSettings>>().Value;
+                return new ProductKafkaProducer(kafkaSettings.BootstrapServers);
+            });
+      
+
 
             builder.Services.AddControllers();
 

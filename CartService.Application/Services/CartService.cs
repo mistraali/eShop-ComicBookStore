@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CartService.Application.Events;
 using CartService.Application.Kafka;
+using CartService.Application.Kafka.Utils;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
@@ -15,10 +16,12 @@ public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
     private readonly CartKafkaProducer _cartKafkaProducer;
-    public CartService(ICartRepository cartRepository, CartKafkaProducer cartKafkaProducer)
+    private readonly ProductCheckResponseAwaiter _productCheckAwaiter;  
+    public CartService(ICartRepository cartRepository, CartKafkaProducer cartKafkaProducer, ProductCheckResponseAwaiter productCheckAvaiter)
     {
         _cartRepository = cartRepository;
         _cartKafkaProducer = cartKafkaProducer;
+        _productCheckAwaiter = productCheckAvaiter;
     }
 
     public async Task<Cart> CreateCartForUserAsync(int userId)
@@ -61,11 +64,21 @@ public class CartService : ICartService
 
     public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
     {
+        //odpytuje Product serwis czy produkt istnieje
         await _cartKafkaProducer.SendCheckProductExistsAsync(new CheckIfProductExistsEvent
         {
             ProductId = item.ProductId
         });
 
+        var exists = await _productCheckAwaiter.WaitForResponseAsync(item.ProductId, TimeSpan.FromSeconds(5));
+
+        // Produkt nie istnieje – przerywamy operację
+        if (!exists)
+        {
+            return null;
+        }
+
+        // Produkt istnieje – kontynuujemy dodawanie do koszyka
         var newItem = new CartItem
         {
             CartId = item.CartId,

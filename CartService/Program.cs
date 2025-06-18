@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using CartService.Kafka;
 using Microsoft.Extensions.Options;
 using CartService.Application.Kafka;
+using CartService.Application.Kafka.Utils;
+using CartService.Infrastructure.Kafka;
 
 namespace CartService;
 
@@ -20,8 +22,8 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddScoped<ICartService, CartService.Application.Services.CartService>();
-        
-        //Kafka
+
+        //Kafka user events consumer
         try
         {
             builder.Services.AddHostedService<KafkaUserEventsConsumer>();
@@ -33,11 +35,24 @@ public class Program
         //for product events
         builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
 
+        builder.Services.AddSingleton<ProductCheckResponseAwaiter>();
+
         builder.Services.AddSingleton<CartKafkaProducer>(sp =>
         {
             var kafkaSettings = sp.GetRequiredService<IOptions<KafkaSettings>>().Value;
             return new CartKafkaProducer(kafkaSettings.BootstrapServers);
         });
+
+        // Kafka Product events consumer
+        builder.Services.AddSingleton<ProductExistsResponseConsumer>(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<KafkaSettings>>().Value;
+            var awaiter = sp.GetRequiredService<ProductCheckResponseAwaiter>();
+            return new ProductExistsResponseConsumer(awaiter, settings.BootstrapServers);
+        });
+
+        builder.Services.AddHostedService<CartConsumerHostedService>();
+
 
 
         builder.Services.AddControllers();
