@@ -71,7 +71,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "Wpisz token w formacie: Bearer {token}",
