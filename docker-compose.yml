@@ -18,6 +18,8 @@ services:
       dockerfile: ProductService/Dockerfile
     ports:
       - "5002:80"
+    depends_on:
+      - kafka
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:
@@ -57,6 +59,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - eshop-network
 

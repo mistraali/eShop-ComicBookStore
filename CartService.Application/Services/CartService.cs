@@ -70,7 +70,7 @@ public class CartService : ICartService
             ProductId = item.ProductId
         });
 
-        var exists = await _productCheckAwaiter.WaitForResponseAsync(item.ProductId, TimeSpan.FromSeconds(5));
+        var exists = await _productCheckAwaiter.WaitForResponseAsync(item.ProductId, TimeSpan.FromSeconds(15));
 
         // Produkt nie istnieje – przerywamy operację
         if (!exists)
