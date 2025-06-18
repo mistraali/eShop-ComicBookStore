@@ -13,6 +13,8 @@ public class JwtTokenService : IJwtTokenService
 
     public JwtTokenService(IOptions<JwtSettings> settings)
     {
+        if (settings == null)
+            throw new ArgumentNullException(nameof(settings));
         _settings = settings.Value;
     }
 

@@ -20,7 +20,7 @@ public class UserKafkaProducer
         _producer = new ProducerBuilder<Null, string>(config).Build();
     }
 
-    public async Task PublishUserLoggedAsync(UserLoggedEvent @event)
+    public virtual async Task PublishUserLoggedAsync(UserLoggedEvent @event)
     {
         var json = JsonSerializer.Serialize(@event);
         Console.WriteLine($"[KafkaProducer] Sending event: {json}");

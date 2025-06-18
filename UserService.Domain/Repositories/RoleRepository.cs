@@ -42,6 +42,14 @@ public class RoleRepository :IRoleRepository
     public async Task DeleteRoleAsync(Role role)
     {
         _context.Roles.Remove(role);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // unhandled
+        }
     }
+
 }

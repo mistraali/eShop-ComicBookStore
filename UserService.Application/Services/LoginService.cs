@@ -15,11 +15,13 @@ public class LoginService : ILoginService
 {
     protected IJwtTokenService _jwtTokenService;
     protected IUserRepository _userRepository;
+    private readonly UserKafkaProducer _kafkaProducer;
 
-    public LoginService(IJwtTokenService jwtTokenService, IUserRepository userRepository)
+    public LoginService(IJwtTokenService jwtTokenService, IUserRepository userRepository, UserKafkaProducer kafkaProducer)
     {
         _jwtTokenService = jwtTokenService;
         _userRepository = userRepository;
+        _kafkaProducer = kafkaProducer;
     }
 
     public async Task<string> Login(string username, string password)
@@ -35,11 +37,9 @@ public class LoginService : ILoginService
 
         var token = _jwtTokenService.GenerateToken(user.Id, roles);
 
-        var kafka = new UserKafkaProducer("kafka:9092"); // lub z appsettings
-
         Console.WriteLine($"[LoginService] Sending UserLoggedEvent for user: {user.Id}, {user.Email}");
 
-        await kafka.PublishUserLoggedAsync(new UserLoggedEvent
+        await _kafkaProducer.PublishUserLoggedAsync(new UserLoggedEvent
         {
             UserId = user.Id,
             Email = user.Email
