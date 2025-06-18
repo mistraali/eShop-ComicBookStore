@@ -8,25 +8,27 @@ using Confluent.Kafka;
 using ProductService.Domain.Repositories;
 using ProductService.Application.Events;
 using ProductService.Application.Kafka.Producers;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace ProductService.Application.Kafka.Consumers;
 
 public class CheckIfProductExistsConsumer
 {
-    private readonly IBookRepository _bookRepository;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ProductKafkaProducer _producer;
     private readonly IConsumer<Ignore, string> _consumer;
 
-    public CheckIfProductExistsConsumer(IBookRepository bookRepository, ProductKafkaProducer producer, string bootstrapServers)
+    public CheckIfProductExistsConsumer(IServiceScopeFactory scopeFactory, ProductKafkaProducer producer, IOptions<KafkaSettings> options)
     {
-        _bookRepository = bookRepository;
+        _scopeFactory = scopeFactory;
         _producer = producer;
 
         var config = new ConsumerConfig
         {
             GroupId = "product-service-group",
-            BootstrapServers = bootstrapServers,
+            BootstrapServers = options.Value.BootstrapServers,
             AutoOffsetReset = AutoOffsetReset.Earliest
         };
 
@@ -43,7 +45,10 @@ public class CheckIfProductExistsConsumer
                 var result = _consumer.Consume(cancellationToken);
                 var message = JsonSerializer.Deserialize<CheckIfProductExistsEvent>(result.Message.Value);
 
-                var exists = await _bookRepository.ExistsAsync(message.ProductId);
+                using var scope = _scopeFactory.CreateScope();
+                var repo = scope.ServiceProvider.GetRequiredService<IBookRepository>();
+
+                var exists = await repo.ExistsAsync(message.ProductId);
 
                 var response = new ProductExistsEvent
                 {
