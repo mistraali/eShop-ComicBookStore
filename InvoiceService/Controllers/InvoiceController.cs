@@ -1,4 +1,5 @@
-﻿using InvoiceService.Application.Services;
+﻿using CartService.Domain.Events;
+using InvoiceService.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -52,7 +53,7 @@ namespace InvoiceService.Controllers
         }
 
         // POST api/<InvoiceController>
-        [HttpPost("create-invoice-for-user-purchase")]
+        [HttpPost("create-invoice-for-user-purchase-manually")]
         public async Task<IActionResult> CreateInvoiceForUserPurchase(int userId, List<int> invoiceItems)
         {
             var result = await _invoiceService.CreateInvoiceForUserPurchaseAsync(userId, invoiceItems);
@@ -66,6 +67,23 @@ namespace InvoiceService.Controllers
                 // Return error response
                 return BadRequest(new { message = "Impossible to create invoice. Check user Id and items." });
             }               
+        }
+
+        // POST api/<InvoiceController>
+        [HttpPost("create-invoice-for-user-from-checkedout-cart")]
+        public async Task<IActionResult> CreateInvoiceForCheckedOutCart([FromBody] CartCheckedOutEvent cartCheckedOutEvent)
+        {
+            var result = await _invoiceService.CreateInvoiceForCheckedOutCartAsync(cartCheckedOutEvent);
+            if (result != null)
+            {
+                // Return success response
+                return Ok(new { message = "Invoice created successfully.", invoiceId = result.InvoiceId });
+            }
+            else
+            {
+                // Return error response
+                return BadRequest(new { message = "Impossible to create invoice. Check payload." });
+            }
         }
     }
 }
