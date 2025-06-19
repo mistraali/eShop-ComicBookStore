@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
+using CartService.Application.Infrastructure.Services;
+using CartService.Domain.Exceptions;
 
 namespace CartService.Application.Services;
 
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
-    public CartService(ICartRepository cartRepository)
+    private readonly IProductServiceClient _productServiceClient;
+    public CartService(ICartRepository cartRepository, IProductServiceClient productServiceClient)
     {
         _cartRepository = cartRepository;
+        _productServiceClient = productServiceClient;
     }
 
     public async Task<Cart> CreateCartForUserAsync(int userId)
@@ -57,24 +61,31 @@ public class CartService : ICartService
 
     public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
     {
-        var newItem = new CartItem
-        {
-            CartId = item.CartId,
-            ProductId = item.ProductId,
-            Quantity = item.Quantity
-        };
+       //Check if product exists in ProductService
+            var productExists = await _productServiceClient.CheckIfProductExistsAsync(item.ProductId);
+            if (!productExists)
+            {
+                throw new ProductNotFoundException(item.ProductId);
+            }
 
-        var result = await _cartRepository.AddItemToCartAsync(newItem);  
-        
-        var dto = new GetCartItemDto
-        {
-            CartItemId = result.CartItemId,
-            CartId = result.CartId,
-            ProductId = result.ProductId,
-            Quantity = result.Quantity
-        };
+            var newItem = new CartItem
+            {
+                CartId = item.CartId,
+                ProductId = item.ProductId,
+                Quantity = item.Quantity
+            };
 
-        return dto;
+            var result = await _cartRepository.AddItemToCartAsync(newItem);
+
+            var dto = new GetCartItemDto
+            {
+                CartItemId = result.CartItemId,
+                CartId = result.CartId,
+                ProductId = result.ProductId,
+                Quantity = result.Quantity
+            };
+
+            return dto;
     }
 
     public async Task<GetCartDto> RemoveItemFromCartAsync(int userId, int productId)
