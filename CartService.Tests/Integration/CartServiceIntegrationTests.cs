@@ -1,10 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CartService.Application.Infrastructure.Services;
 using CartService.Application.Services;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CartService.Tests.Integration;
@@ -14,6 +16,7 @@ public class CartServiceIntegrationTests : IDisposable
     private readonly CartDataContext _context;
     private readonly CartRepository _repository;
     private readonly CartService.Application.Services.CartService _service;
+    private readonly Mock<IProductServiceClient> _productServiceClientMock;
 
     public CartServiceIntegrationTests()
     {
@@ -22,7 +25,13 @@ public class CartServiceIntegrationTests : IDisposable
             .Options;
         _context = new CartDataContext(options);
         _repository = new CartRepository(_context);
-        _service = new CartService.Application.Services.CartService(_repository);
+
+        _productServiceClientMock = new Mock<IProductServiceClient>();
+        _productServiceClientMock
+            .Setup(p => p.CheckIfProductExistsAsync(It.IsAny<int>()))
+            .ReturnsAsync(true); // domyślnie produkt istnieje
+
+        _service = new CartService.Application.Services.CartService(_repository, _productServiceClientMock.Object);
     }
 
     public void Dispose()

@@ -1,24 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CartService.Application.Infrastructure.Services;
 using CartService.Application.Services;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CartService.Tests.Unit;
 public class CartServiceTests
 {
     private readonly Mock<ICartRepository> _cartRepositoryMock;
+    private readonly Mock<IProductServiceClient> _productServiceClientMock;
     private readonly CartService.Application.Services.CartService _cartService;
 
     public CartServiceTests()
     {
         _cartRepositoryMock = new Mock<ICartRepository>();
-        _cartService = new CartService.Application.Services.CartService(_cartRepositoryMock.Object);
+        _productServiceClientMock = new Mock<IProductServiceClient>();
+        _productServiceClientMock
+            .Setup(p => p.CheckIfProductExistsAsync(It.IsAny<int>()))
+            .ReturnsAsync(true); // domyślnie produkt istnieje
+
+        _cartService = new CartService.Application.Services.CartService(
+            _cartRepositoryMock.Object,
+            _productServiceClientMock.Object
+        );
     }
 
     [Fact]

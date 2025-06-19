@@ -1,5 +1,6 @@
 ﻿using CartService.Application.Services;
 using CartService.Domain.DTOs;
+using CartService.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Validations;
@@ -66,16 +67,23 @@ namespace CartService.Controllers
         [HttpPut("add-item-to-cart")]
         public async Task<IActionResult> AddItemToCart([FromBody] AddItemToCartDto item)
         {
-            var result = await _cartService.AddItemToCartAsync(item);
-            if (result != null)
-            {
-                // Return success response
-                return Ok(new { message = $"Item added to cart for user with Id: {item.CartId}." });
+            try
+            { var result = await _cartService.AddItemToCartAsync(item);
+                if (result != null)
+                {
+                    // Return success response
+                    return Ok(new { message = $"Item added to cart for user with Id: {item.CartId}." });
+                }
+                else
+                {
+                    // Return error response
+                    return BadRequest(new { message = "Cannot add item to cart. Check your input" });
+                }
             }
-            else
+            catch (ProductNotFoundException ex)
             {
-                // Return error response
-                return BadRequest(new { message = "Cannot add item to cart." });
+                // Return error response if product not found
+                return NotFound(new { message = $"Product with Id: {item.ProductId} does not exist." });
             }
         }
 

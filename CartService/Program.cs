@@ -3,6 +3,7 @@ using CartService.Application.Services;
 using CartService.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using CartService.Kafka;
+using CartService.Application.Infrastructure.Services;
 
 namespace CartService;
 
@@ -28,6 +29,12 @@ public class Program
         {
             Console.WriteLine($"Nie uda³o siê dodaæ KafkaUserEventsConsumer: {ex.Message}");
         }
+
+        //HTTP Client for ProductService
+        builder.Services.AddHttpClient<IProductServiceClient, ProductServiceClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://productservice/api/");
+        });
 
 
         builder.Services.AddControllers();
