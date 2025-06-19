@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 using CartService.Domain.DTOs;
 using CartService.Domain.Models;
 using CartService.Domain.Repositories;
+using CartService.Application.Infrastructure.Services;
 
 namespace CartService.Application.Services;
 
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
-    public CartService(ICartRepository cartRepository)
+    private readonly IProductServiceClient _productServiceClient;
+    public CartService(ICartRepository cartRepository, IProductServiceClient productServiceClient)
     {
         _cartRepository = cartRepository;
+        _productServiceClient = productServiceClient;
     }
 
     public async Task<Cart> CreateCartForUserAsync(int userId)
@@ -57,6 +60,14 @@ public class CartService : ICartService
 
     public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
     {
+
+        //Check if product exists in ProductService
+        var productExists = await _productServiceClient.CheckIfProductExistsAsync(item.ProductId);
+        if (productExists == null)
+        {
+            throw new InvalidOperationException($"Product with id: {item.ProductId} does not exist.");
+        }
+
         var newItem = new CartItem
         {
             CartId = item.CartId,
