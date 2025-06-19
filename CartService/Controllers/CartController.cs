@@ -138,5 +138,22 @@ namespace CartService.Controllers
                 return BadRequest(new { message = "Cannot delete the cart." });
             }
         }
+
+        // DELETE api/<CartController>/5
+        [HttpDelete("cart-checkout-by-user-id")]
+        public async Task<IActionResult> CartCheckoutById(int userId)
+        {
+            var result = await _cartService.CartCheckoutByIdAsync(userId);
+            if (result == true)
+            {
+                // Return success response
+                return Ok(new { message = $"Cart for user with Id: {userId} was checked-out." });
+            }
+            else
+            {
+                // Return error response
+                return BadRequest(new { message = "Cannot checkout the cart." });
+            }
+        }
     }
 }

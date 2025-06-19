@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InvoiceService.Domain.Events;
 using InvoiceService.Domain.DTOs;
 using InvoiceService.Domain.Models;
 using InvoiceService.Domain.Repositories;
@@ -53,5 +54,23 @@ public class InvoiceService : IInvoiceService
         }
 
         return invoice;
+    }
+
+    public async Task<Invoice> CreateInvoiceForCheckedOutCartAsync(CartCheckedOutEvent cartCheckedOutEvent)
+    {
+        var invoice = new Invoice { UserId = cartCheckedOutEvent.UserId };
+        var result = await _invoiceRepository.CreateInvoiceAsync(invoice);
+
+
+        foreach (var item in cartCheckedOutEvent.CartItems)
+        {
+            var invoiceItem = new InvoiceItem { 
+                ProductId = item.ProductId, 
+                InvoiceId = result.InvoiceId,
+                Quantity  = item.Quantity
+            };
+            var itemResult = await _invoiceRepository.CreateInvoiceItemAsync(invoiceItem);
+        }
+        return result;
     }
 }

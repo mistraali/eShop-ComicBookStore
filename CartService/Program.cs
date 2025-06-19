@@ -4,6 +4,7 @@ using CartService.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using CartService.Kafka;
 using CartService.Application.Infrastructure.Services;
+using CartService.Application.Kafka;
 
 namespace CartService;
 
@@ -20,7 +21,7 @@ public class Program
         // Add services to the container.
         builder.Services.AddScoped<ICartService, CartService.Application.Services.CartService>();
         
-        //Kafka
+        //Kafka for User (consumer)
         try
         {
             builder.Services.AddHostedService<KafkaUserEventsConsumer>();
@@ -29,6 +30,14 @@ public class Program
         {
             Console.WriteLine($"Nie uda³o siê dodaæ KafkaUserEventsConsumer: {ex.Message}");
         }
+
+        //Kafka for Invoice (producer)
+        builder.Services.AddScoped<CartToInvoiceKafkaProducer>(provider =>
+        {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var bootstrapServers = config.GetSection("Kafka:BootstrapServers").Value;
+            return new CartToInvoiceKafkaProducer(bootstrapServers);
+        });
 
         //HTTP Client for ProductService
         builder.Services.AddHttpClient<IProductServiceClient, ProductServiceClient>(client =>

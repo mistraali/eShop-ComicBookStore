@@ -8,6 +8,8 @@ using CartService.Domain.Models;
 using CartService.Domain.Repositories;
 using CartService.Application.Infrastructure.Services;
 using CartService.Domain.Exceptions;
+using CartService.Application.Kafka;
+using CartService.Domain.Events;
 
 namespace CartService.Application.Services;
 
@@ -15,10 +17,12 @@ public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
     private readonly IProductServiceClient _productServiceClient;
-    public CartService(ICartRepository cartRepository, IProductServiceClient productServiceClient)
+    private readonly CartToInvoiceKafkaProducer _kafkaProducer;
+    public CartService(ICartRepository cartRepository, IProductServiceClient productServiceClient, CartToInvoiceKafkaProducer kafkaProducer)
     {
         _cartRepository = cartRepository;
         _productServiceClient = productServiceClient;
+        _kafkaProducer = kafkaProducer;
     }
 
     public async Task<Cart> CreateCartForUserAsync(int userId)
@@ -138,5 +142,33 @@ public class CartService : ICartService
         
         await _cartRepository.DeleteCartByIdAsync(cart.UserId);
         return true; 
+    }
+
+    public async Task<bool> CartCheckoutByIdAsync(int userId)
+    {
+
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+        if (cart == null || !cart.CartItems.Any())
+        {
+            return false; // cart does not exist or is empty
+        }
+
+        // Send cart to Invoice Service via Kafka
+        await _kafkaProducer.PublishCartChekedOutAsync(new CartCheckedOutEvent
+        {
+            UserId = userId,
+            CartItems = cart.CartItems.Select(ci => new GetCartItemDto
+            {
+                ProductId = ci.ProductId,
+                Quantity = ci.Quantity,
+                CartItemId = ci.CartItemId,
+                CartId = ci.CartId  
+            }).ToList()
+        });
+
+        // Clear the cart after checkout
+        await _cartRepository.ClearCartByIdAsync(userId);
+
+        return true; // checkout successful
     }
 }

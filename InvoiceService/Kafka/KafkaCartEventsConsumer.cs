@@ -1,18 +1,16 @@
-﻿using CartService.Domain.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Confluent.Kafka;
-using CartService.Domain.Events;
-using CartService.Domain.Repositories;
-using CartService.Application.Services;
+using InvoiceService.Domain.Events;
+using InvoiceService.Application.Services;
 
-namespace CartService.Kafka;
+namespace InvoiceService.Kafka;
 
-public class KafkaUserEventsConsumer : BackgroundService
+public class KafkaCartEventsConsumer : BackgroundService
 {
     private readonly IServiceProvider _services;
-    private readonly ILogger<KafkaUserEventsConsumer> _logger;
+    private readonly ILogger<KafkaCartEventsConsumer> _logger;
 
-    public KafkaUserEventsConsumer(IServiceProvider services, ILogger<KafkaUserEventsConsumer> logger)
+    public KafkaCartEventsConsumer(IServiceProvider services, ILogger<KafkaCartEventsConsumer> logger)
     {
         _services = services;
         _logger = logger;
@@ -52,13 +50,13 @@ public class KafkaUserEventsConsumer : BackgroundService
         var config = new ConsumerConfig
         {
             BootstrapServers = "kafka:9092",
-            GroupId = "cart-service",
+            GroupId = "invoice-service",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = true
         };
 
         using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-        consumer.Subscribe("user-events");
+        consumer.Subscribe("cart-events");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -67,12 +65,12 @@ public class KafkaUserEventsConsumer : BackgroundService
                 var result = consumer.Consume(stoppingToken);
                 _logger.LogInformation($"Odebrano event: {result.Message.Value}");
 
-                var @event = JsonSerializer.Deserialize<UserLoggedEvent>(result.Message.Value);
+                var @event = JsonSerializer.Deserialize<CartCheckedOutEvent>(result.Message.Value);
 
                 using (var scope = _services.CreateScope())
                 {
-                    var cartService = scope.ServiceProvider.GetRequiredService<ICartService>();
-                    await cartService.CreateCartForUserAsync(@event.UserId);
+                    var cartService = scope.ServiceProvider.GetRequiredService<IInvoiceService>();
+                    await cartService.CreateInvoiceForCheckedOutCartAsync(@event);
                 }
             }
             catch (ConsumeException ex)

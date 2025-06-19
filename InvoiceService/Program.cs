@@ -1,6 +1,7 @@
 
 using InvoiceService.Application.Services;
 using InvoiceService.Domain.Repositories;
+using InvoiceService.Kafka;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceService
@@ -18,6 +19,15 @@ namespace InvoiceService
             // Add services to the container.
             builder.Services.AddScoped<IInvoiceService, InvoiceService.Application.Services.InvoiceService>();
 
+            //Kafka for User (consumer)
+            try
+            {
+                builder.Services.AddHostedService<KafkaCartEventsConsumer>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Nie uda³o siê dodaæ KafkaCartEventsConsumer: {ex.Message}");
+            }
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
