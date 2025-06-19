@@ -7,15 +7,18 @@ using InvoiceService.Domain.Events;
 using InvoiceService.Domain.DTOs;
 using InvoiceService.Domain.Models;
 using InvoiceService.Domain.Repositories;
+using InvoiceService.Application.Infrastructure.Services;
 
 namespace InvoiceService.Application.Services;
 
 public class InvoiceService : IInvoiceService
 {
     private readonly IInvoiceRepository _invoiceRepository;
-    public InvoiceService(IInvoiceRepository invoiceRepository)
+    private readonly IProductServiceClient _productServiceClient;
+    public InvoiceService(IInvoiceRepository invoiceRepository, IProductServiceClient productServiceClient)
     {
         _invoiceRepository = invoiceRepository;
+        _productServiceClient = productServiceClient;
     }
 
     public async Task<GetInvoiceDto> CreateInvoiceForUserPurchaseAsync(int userId, List<int> invoiceItems)
@@ -64,10 +67,14 @@ public class InvoiceService : IInvoiceService
 
         foreach (var item in cartCheckedOutEvent.CartItems)
         {
+            var productName = await _productServiceClient.GetProductNameByIdAsync(item.ProductId);
+
             var invoiceItem = new InvoiceItem { 
                 ProductId = item.ProductId, 
                 InvoiceId = result.InvoiceId,
-                Quantity  = item.Quantity
+                Quantity  = item.Quantity,
+                ProductName = productName
+
             };
             var itemResult = await _invoiceRepository.CreateInvoiceItemAsync(invoiceItem);
         }
