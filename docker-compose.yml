@@ -36,6 +36,19 @@ services:
     networks:
       - eshop-network
 
+  invoiceservice:
+    build:
+      context: .
+      dockerfile: InvoiceService/Dockerfile
+    ports:
+      - "5004:80"
+    depends_on:
+      - kafka
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - eshop-network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     ports:
