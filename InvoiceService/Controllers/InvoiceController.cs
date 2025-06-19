@@ -1,4 +1,4 @@
-﻿using CartService.Domain.Events;
+﻿using InvoiceService.Domain.Events;
 using InvoiceService.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,7 @@
 ﻿using CartService.Domain.Models;
 using System.Text.Json;
 using Confluent.Kafka;
-using UserService.Domain.Events;
+using CartService.Domain.Events;
 using CartService.Domain.Repositories;
 using CartService.Application.Services;
 

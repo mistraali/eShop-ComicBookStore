@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Confluent.Kafka;
-using CartService.Domain.Events;
+using InvoiceService.Domain.Events;
 using InvoiceService.Application.Services;
 
 namespace InvoiceService.Kafka;

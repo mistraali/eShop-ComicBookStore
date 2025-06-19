@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using InvoiceService.Domain.DTOs;
 using InvoiceService.Domain.Models;
-using CartService.Domain.Events;
+using InvoiceService.Domain.Events;
 
 namespace InvoiceService.Application.Services;
 

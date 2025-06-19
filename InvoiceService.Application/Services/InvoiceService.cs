@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CartService.Domain.Events;
+using InvoiceService.Domain.Events;
 using InvoiceService.Domain.DTOs;
 using InvoiceService.Domain.Models;
 using InvoiceService.Domain.Repositories;

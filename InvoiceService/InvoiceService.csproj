@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CartService.Domain\CartService.Domain.csproj" />
     <ProjectReference Include="..\InvoiceService.Application\InvoiceService.Application.csproj" />
     <ProjectReference Include="..\InvoiceService.Domain\InvoiceService.Domain.csproj" />
   </ItemGroup>

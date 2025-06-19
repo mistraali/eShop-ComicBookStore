@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CartService.Application\CartService.Application.csproj" />
     <ProjectReference Include="..\CartService.Domain\CartService.Domain.csproj" />
-    <ProjectReference Include="..\UserService.Domain\UserService.Domain.csproj" />
   </ItemGroup>
 
 </Project>
