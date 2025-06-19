@@ -57,6 +57,8 @@ public class CartService : ICartService
 
     public async Task<GetCartItemDto> AddItemToCartAsync(AddItemToCartDto item)
     {
+        if (item.ProductId < 0 || item.Quantity <= 0) return null;
+
         var newItem = new CartItem
         {
             CartId = item.CartId,
@@ -89,11 +91,15 @@ public class CartService : ICartService
         {
             throw new InvalidOperationException($"Item with product id: {productId} does not exist in the cart for user with id: {userId}.");
         }
+
         await _cartRepository.RemoveItemFromCartAsync(userId, productId);
+
+        var updatedCart = await _cartRepository.GetCartByUserIdAsync(userId);
+
         var cartDto = new GetCartDto
         {
-            UserId = cart.UserId,
-            CartItems = cart.CartItems.Select(c => c.ProductId).ToList()
+            UserId = updatedCart.UserId,
+            CartItems = updatedCart.CartItems.Select(c => c.ProductId).ToList()
         };
 
         return cartDto;
@@ -104,6 +110,7 @@ public class CartService : ICartService
         await _cartRepository.ClearCartByIdAsync(userId);
 
         var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+
         var cartDto = new GetCartDto
         {
             UserId = cart.UserId,

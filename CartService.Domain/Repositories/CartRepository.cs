@@ -17,29 +17,43 @@ public class CartRepository : ICartRepository
         _context = context;
     }
 
-    async Task<List<Cart>> ICartRepository.GetAllCartsAsync()
+    public async Task<List<Cart>> GetAllCartsAsync()
     {
         return await _context.Carts.Include(c => c.CartItems).ToListAsync();
     }
 
-    async Task<Cart> ICartRepository.GetCartByUserIdAsync(int userId)
+    public async Task<Cart> GetCartByUserIdAsync(int userId)
     {
         return await _context.Carts
             .Include(c => c.CartItems)
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
-    async Task<CartItem> ICartRepository.AddItemToCartAsync(CartItem newItem)
+    public async Task<CartItem> AddItemToCartAsync(CartItem newItem)
     {
         await _context.CartItems.AddAsync(newItem);
         await _context.SaveChangesAsync();
         return newItem;
     }
 
-    Task<CartItem> ICartRepository.UpdateItemInCartAsync(CartItem newItem)
+    public async Task<CartItem> UpdateItemInCartAsync(CartItem updatedItem)
     {
-        throw new NotImplementedException();
+        var existingItem = await _context.CartItems
+            .FirstOrDefaultAsync(ci => ci.CartItemId == updatedItem.CartItemId);
+
+        if (existingItem == null)
+        {
+            throw new InvalidOperationException($"CartItem with id {updatedItem.CartItemId} not found.");
+        }
+
+        existingItem.Quantity = updatedItem.Quantity;
+        // jeśli inne pola też trzeba aktualizować, to tutaj
+
+        await _context.SaveChangesAsync();
+
+        return existingItem;
     }
+
 
     public async Task<Cart> ClearCartByIdAsync(int userId)
     {
